@@ -46,6 +46,8 @@ mat cumulative_row_sums(mat P) {
     mat T(P.n_rows, P.n_cols);
     for (ullong i = 0; i < P.n_rows; i++) {
         T.row(i) = cumsum(P.row(i));
+		// make sure that all rows end in a one
+		T(i, P.n_rows - 1) = 1.0;
     }
     return T;
 }
@@ -131,7 +133,8 @@ uvec simulate_allele_freq_trajectory(const mat cQ, const ullong observed) // {{{
     return uvec(freq);
 } // }}}
 
-void print_usage() {
+void print_usage() // {{{
+{
     cerr << "USAGE:" << endl <<
         "./allele_age_simulator --population_size=N [--theta=0.0] [--dominance=0.5] [--obsereved=1] [--replicates=1] [--seed=x] [--stdout] [--suffix=out]" << endl <<
         "population_size    number of individuals in a population" << endl <<
@@ -142,7 +145,7 @@ void print_usage() {
         "seed               random number seed" << endl <<
         "stdout             output results to STDOUT. If not specified, `.csv` with input parameters is used as output" << endl <<
         "suffix             suffix to append to out file name. Ignored if `stdout` is present." << endl;
-}
+} // }}}
 
 int main(int argc, char *argv[])
 {
