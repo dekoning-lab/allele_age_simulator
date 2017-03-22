@@ -136,6 +136,19 @@ uvec simulate_allele_freq_trajectory(const mat cQ, const ullong observed) // {{{
     return uvec(freq);
 } // }}}
 
+void print_usage() {
+    cerr << "USAGE:" << endl <<
+        "./allele_age_simulator --population_size=N [--theta=0.0] [--dominance=0.5] [--obsereved=1] [--replicates=1] [--seed=x] [--stdout] [--suffix=out]" << endl <<
+        "population_size    number of individuals in a population" << endl <<
+        "theta              population-scaled mutation rate. Assumes bidirectinally equal mutation rates" << endl <<
+        "dominance          Ewens' dominance coefficient h" << endl <<
+        "observed           number of allele copies observed" << endl <<
+        "replicates         number of simulation replicates" << endl << 
+        "seed               random number seed" << endl <<
+        "stdout             output results to STDOUT. If not specified, `.csv` with input parameters is used as output" << endl <<
+        "suffix             suffix to append to out file name. Ignored if `stdout` is present." << endl;
+}
+
 int main(int argc, char *argv[])
 {
     // {{{ Parse args
@@ -145,22 +158,17 @@ int main(int argc, char *argv[])
 
     argh::parser opts(argc, argv);
 
+    if (opts["help"]) {
+        print_usage();
+        return(1);
+    }
+
     if(!(opts("population_size") >> Ne)) {
         cerr << "Must provide population_size" << endl;
-
-        cerr << "USAGE:" << endl <<
-            "./allele_age_simulator --population_size=N [--theta=0.0] [--dominance=0.5] [--obsereved=1] [--replicates=1] [--stdout] [--suffix=out]" << endl <<
-            "population_size    number of individuals in a population" << endl <<
-            "theta              population-scaled mutation rate. Assumes bidirectinally equal mutation rates" << endl <<
-            "dominance          Ewens' dominance coefficient h" << endl <<
-            "observed           number of allele copies observed" << endl <<
-            "replicates         number of simulation replicates" << endl << 
-            "seed               random number seed" << endl <<
-            "stdout             output results to STDOUT. If not specified, `.csv` with input parameters is used as output" << endl <<
-            "suffix             suffix to append to out file name. Ignored if `stdout` is present.`" << endl;
-
-        exit(2);
+        print_usage();
+        return(2);
     }
+
 
     opts("theta", 0.0) >> t;
     opts("dominance", 0.5) >> h;
