@@ -45,11 +45,7 @@ mat wf_transition_matrix(ullong N, double s = 0, double h = 0.5, double u = 0, d
 mat cumulative_row_sums(mat P) {
     mat T(P.n_rows, P.n_cols);
     for (ullong i = 0; i < P.n_rows; i++) {
-        double s = 0;
-        for (ullong j = 0; j < P.n_cols; j++) {
-            s += P(i, j);
-            T(i, j) = s;
-        }
+        T.row(i) = cumsum(P.row(i));
     }
     return T;
 }
@@ -79,7 +75,6 @@ mt19937_64* get_thread_rng(ullong seed) {
 uvec simulate_allele_age_parallel(const mat cQ, const ullong observed, ullong replicates, ullong seed) // {{{
 {
     
-    //uvec ages(replicates);
     vector<ullong> ages(replicates, 0);
     uniform_real_distribution<double> unif(0, 1);
     
@@ -179,6 +174,11 @@ int main(int argc, char *argv[])
     if (!(opts("seed") >> seed)) {
         seed = time(NULL);
     }
+
+    stringstream out_name;
+    out_name << "N_" << Ne << "_theta_" << t << "_h_" << h << "_x_" << x << "_" << out_suffix;
+    string params = out_name.str();
+
     // }}}
 
     cerr << "Using random seed " << seed << endl;
@@ -202,6 +202,10 @@ int main(int argc, char *argv[])
     
     cerr << "Building matrix cQ" << endl;
     mat cQ = cumulative_row_sums(Qp);
+    if (opts["save_matrices"]) {
+        cQ.save("sampling_" + params + ".csv", csv_ascii);
+        Qp.save("transitions_" + params + ".csv", csv_ascii);
+    }
     
     cerr << "Simulating" << endl;
     //uvec freq = simulate_allele_freq_trajectory(cQ, x);
@@ -210,9 +214,7 @@ int main(int argc, char *argv[])
     if (opts["stdout"]) {
         ages.print();
     } else {
-        stringstream out_name;
-        out_name << "ages_N_" << Ne << "_theta_" << t << "_h_" << h << "_x_" << x << "_" << out_suffix << ".csv";
-        ages.save(out_name.str(), raw_ascii);
+        ages.save("ages_" + params + ".csv", csv_ascii);
     }
     
     return 0;
