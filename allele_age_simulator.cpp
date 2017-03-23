@@ -46,8 +46,6 @@ mat cumulative_row_sums(mat P) {
     mat T(P.n_rows, P.n_cols);
     for (ullong i = 0; i < P.n_rows; i++) {
         T.row(i) = cumsum(P.row(i));
-		// make sure that all rows end in a one
-		T(i, P.n_rows - 1) = 1.0;
     }
     return T;
 }
@@ -78,7 +76,6 @@ uvec simulate_allele_age_parallel(const mat cQ, const ullong observed, ullong re
 {
     
     vector<ullong> ages(replicates, 0);
-    uniform_real_distribution<double> unif(0, 1);
     
     #pragma omp parallel for
     for(ullong i = 0; i < replicates; i++) {
@@ -90,6 +87,8 @@ uvec simulate_allele_age_parallel(const mat cQ, const ullong observed, ullong re
         while (state != 0) {
             // Draw U and linear search
             mt19937_64* rng = get_thread_rng(seed);
+            // Max(cQ.row(state)) should be close to 1, but sometimes is 9.9999999e-2
+            uniform_real_distribution<double> unif(0, max(cQ.row(state)));
             u = unif(*rng);
             try {
                 for(j = 0; u > cQ(state, j); j++);
