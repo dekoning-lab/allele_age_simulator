@@ -5,6 +5,7 @@
 #include <armadillo>
 #include <cmath>
 #include <random>
+#include <chrono>
 #include <gsl/gsl_randist.h>
 
 #include <omp.h>
@@ -12,6 +13,7 @@
 #include "argh.hpp"
 
 using namespace std;
+using namespace chrono;
 using namespace arma;
 
 typedef unsigned long long ullong;
@@ -148,6 +150,8 @@ void print_usage() // {{{
 
 int main(int argc, char *argv[])
 {
+	time_point<system_clock> start, end;
+	start = system_clock::now();
     // {{{ Parse args
     ullong Ne, x, r, seed;
     double t, h;
@@ -212,6 +216,11 @@ int main(int argc, char *argv[])
     cerr << "Simulating" << endl;
     //uvec freq = simulate_allele_freq_trajectory(cQ, x);
     uvec ages = simulate_allele_age_parallel(cQ, x, r, seed);
+
+	end = system_clock::now();
+	duration<double> elapsed = end - start;
+
+	std::cout << params << " took " << elapsed.count() << " s" << endl;
 
     if (opts["stdout"]) {
         ages.print();
