@@ -1,12 +1,12 @@
 # Allele age simulator
 
-This is a simulator of reverse markov process that can be used to simulate a distribution of allele ages.
+This is a simulator of a reversed absorbing Markov process that can be used to approximate the probability distribution of allele ages.
 
-The process of interes is a Wright-Fisher population model, where the starting allele frequency is `1`, and observed allele frequency is `x`.
+The process of interest is a Wright-Fisher model with mutation, selection and dominance, where the starting allele number is `1`, and the observed allele frequency is `x`.
 
-The simulator first creates a reversed process of the given chain, and then simulates from it.
+The simulator first creates a reversed process for the given chain, and then simulates from it.
 
-The reverse Markov process is implemented according to [Chae and Kim, 1994](http://www.sciencedirect.com/science/article/pii/0167637794900205)
+The reversed absorbing Markov process is implemented according to [Chae and Kim, 1994](http://www.sciencedirect.com/science/article/pii/0167637794900205)
 
 ## Dependencies
 
@@ -26,7 +26,7 @@ make
 
 ### Mac OS notes
 
-This code was tested with `GCC`, since it fully support openmp.
+This code was tested with `GCC`, since it fully supports OpenMP.
 Therefore, it is necessary to export the paths to the `GCC` executables before running `cmake`.
 
 ```
